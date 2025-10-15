@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "my_mcp_insecure": {
+      "command": "uvx",
+      "args": [
+        "mcp-transcoder",
+        "--insecure",
+        "${TEST_URL_PLAYWRIGHT}"
+      ]
+    },
+    "my_mcp_ssl_cert_file": {
+      "command": "uvx",
+      "args": [
+        "mcp-transcoder",
+        "--ssl-cert-file",
+        "${MCP_SSL_CERT_FILE}",
+        "${TEST_URL_PLAYWRIGHT}"
+      ]
+    },
+    "my_mcp_ssl_error": {
+      "command": "uvx",
+      "args": [
+        "mcp-transcoder",
+        "${TEST_URL_PLAYWRIGHT}"
+      ]
+    }
+  }
+}
