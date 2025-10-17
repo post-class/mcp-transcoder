@@ -21,6 +21,11 @@ build-backend = "setuptools.build_meta"
 
 [tool.uv]
 package = true
+dev-dependencies = [
+    "pytest",
+    "pytest-anyio",
+    "trio",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
