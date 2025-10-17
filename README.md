@@ -1,6 +1,5 @@
 # 概要
-Streamable HTTP 方式のMCPサーバをStdio方式に変換して使用できるようにするアプリです。
-特徴として、強制的にステートレスにするため、mcp-session-idを毎回削除します。
+MCPクライアントがSTDIO方式にしか対応していない場合に、MCPサーバがStreamableHTTP方式だった場合に使用するアダプタツールです。
 
 ## 利用方法
 ### インストール
@@ -58,8 +57,15 @@ SSEには対応しておりません。
   - 例: `uvx mcp-transcoder --insecure --headers x-api-key YOUR_API_KEY https://example/mcp`
 - 推奨: 検証無効ではなく、CA証明書を指定して検証を有効のままにする
   - 例: `uvx mcp-transcoder --ssl-cert-file /path/to/cacert.pem https://example/mcp`
-  - 互換: 環境変数 `SSL_CERT_FILE=/path/to/cacert.pem` も有効（未指定時のフォールバック）。
   - 補足: `--ssl-cert-file` は MCP 接続の httpx クライアントにのみ適用され、`uvx` の依存解決（PyPI への接続）には影響しません。
+
+# テスト
+```
+uv run pytest -q
+```
+
+# uvx でキャッシュ対策
+uvxコマンドに、 --isolated --no-cache を付けるとキャッシュが古いエラーを回避できますので、テスト時には付与してください
 
 # url
 ## pypi
