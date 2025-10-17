@@ -14,7 +14,7 @@ export UV_CACHE_DIR="${ROOT_DIR}/.uv_cache"
 mkdir -p "${UV_CACHE_DIR}"
 
 # バージョンは定数として定義
-MCP_TRANSCODER_VERSION="0.1.0"
+MCP_TRANSCODER_VERSION="0.1.1"
 
 # .env を読み込んで TEST_URL_PLAYWRIGHT を取得
 if [[ -f "${ROOT_DIR}/.env" ]]; then
