@@ -1,74 +1,74 @@
-# 概要
-MCPクライアントがSTDIO方式にしか対応していない場合に、MCPサーバがStreamableHTTP方式だった場合に使用するアダプタツールです。
+# Overview
+This tool is an adapter for situations where your MCP client only supports the STDIO protocol, but the target MCP server speaks StreamableHTTP.
 
-## 利用方法
-### インストール
+## Usage
+### Install
 uv add mcp-transcoder
 
-## クライアントのMCP設定例
+## Example MCP client configuration
 ```json
 {
-	"mcpServers": {
-		"lf-agents": {
-			"command": "uvx",
-			"args": [
-				"mcp-transcoder",
-				"--insecure",
-				"--timeout",
-				"300",
-				"--headers",
-				"x-api-key",
-				"YOUR_API_KEY",
-				"https://your_mcp_domain/mcp"
-			]
-		}
-	}
+  "mcpServers": {
+    "lf-agents": {
+      "command": "uvx",
+      "args": [
+        "mcp-transcoder",
+        "--insecure",
+        "--timeout",
+        "300",
+        "--headers",
+        "x-api-key",
+        "YOUR_API_KEY",
+        "https://your_mcp_domain/mcp"
+      ]
+    }
+  }
 }
 ```
 
-## 前提条件
-MCPサーバはStreamableHTTPである必要があります。
-SSEには対応しておりません。
+## Prerequisites
+- The MCP server must support StreamableHTTP.
+- Server-Sent Events (SSE) is not supported.
 
+## Notes
+- If the server requires an API key, you can pass `--headers KEY VALUE` multiple times.
+- If a custom CA certificate is required, specify `--ssl-cert-file /path/to/cacert.pem` (applies only to the MCP connection). For quick testing, you can set `--insecure` to skip HTTPS verification. The environment variable `SSL_CERT_FILE` is also supported, but `--ssl-cert-file` is recommended so the setting does not affect the entire process.
 
-## 補足:
-- APIキーが必要なサーバの場合は `--headers KEY VALUE` を複数回指定できます。
-- CA証明書が必要な場合、`--ssl-cert-file /path/to/cacert.pem` を指定してください（MCP 接続時のみ適用）。テスト用に簡易実行したい場合、`--insecure` をセットすると HTTPS 検証をスキップします。環境変数 `SSL_CERT_FILE` も利用可能ですが、ツール全体へ波及させないため `--ssl-cert-file` の使用を推奨します。
+## Timeout settings
+- The overall timeout for each request (initialize / list_tools / call_tool, etc.) is 120 seconds by default.
+- To change it, specify `--timeout SECONDS`.
+  - Example: `uvx mcp-transcoder --timeout 300 https://example/mcp`
+- The same value is applied to the HTTP client (httpx) timeouts to improve stability for long-running operations.
 
-## タイムアウト設定
-- 各リクエスト（initialize / list_tools / call_tool など）の「全体タイムアウト」は既定で 120 秒です。
-- 変更する場合は `--timeout 秒数` を指定します。
-  - 例: `uvx mcp-transcoder --timeout 300 https://example/mcp`
-- この値は HTTP 通信（httpx）のタイムアウトにも適用され、長い処理に対する疎通を安定化させます。
+## Command-line options
 
-## コマンドラインオプション一覧（表）
-
-| オプション | 意味 | 既定値 | 設定例 |
+| Option | Description | Default | Example |
 |---|---|---|---|
-| `url` | 接続先の StreamableHTTP MCP エンドポイント（必須） | なし（必須） | `https://your_mcp_streamable_http_endpoint/mcp` |
-| `-H KEY VALUE` / `--headers KEY VALUE` | 追加のHTTPヘッダーを付与（APIキーなど）。 | なし | `--headers x-api-key YOUR_API_KEY`、`--headers Authorization "Bearer YOUR_TOKEN"` |
-| `--insecure` / `--no-insecure` | TLS証明書検証を無効化/有効化 | 検証有効（`--no-insecure`） | 無効化: `--insecure`／推奨: `SSL_CERT_FILE=/path/to/cacert.pem uvx mcp-transcoder ...` |
-| `--timeout SECONDS` | 各リクエストの全体タイムアウト秒（initialize/list_tools/call_tool等） | `120`（または `MCP_PROXY_TIMEOUT` 環境変数） | `--timeout 300`、`MCP_PROXY_TIMEOUT=300 uvx mcp-transcoder ...` |
-| `--ssl-cert-file PATH` | MCP 接続時のみ使用する CA バンドル | なし（システム/既定の信頼ストア） | `--ssl-cert-file /path/to/cacert.pem` |
-| `--log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}` | ログ出力の詳細度 | `INFO` | `--log-level DEBUG` |
+| `url` | The target StreamableHTTP MCP endpoint (required) | none (required) | `https://your_mcp_streamable_http_endpoint/mcp` |
+| `-H KEY VALUE` / `--headers KEY VALUE` | Add extra HTTP headers (e.g., API keys) | none | `--headers x-api-key YOUR_API_KEY`, `--headers Authorization "Bearer YOUR_TOKEN"` |
+| `--insecure` / `--no-insecure` | Disable/enable TLS certificate verification | verification enabled (`--no-insecure`) | Disable: `--insecure` / Recommended: `SSL_CERT_FILE=/path/to/cacert.pem uvx mcp-transcoder ...` |
+| `--timeout SECONDS` | Overall timeout per request (initialize/list_tools/call_tool, etc.) | `120` (or `MCP_PROXY_TIMEOUT` env var) | `--timeout 300`, `MCP_PROXY_TIMEOUT=300 uvx mcp-transcoder ...` |
+| `--ssl-cert-file PATH` | CA bundle used only for MCP connections | system/default trust store | `--ssl-cert-file /path/to/cacert.pem` |
+| `--log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}` | Log verbosity | `INFO` | `--log-level DEBUG` |
 
-## TLS 検証（社内CA / 自己署名対応）
-- `--insecure` を付与すると、リモートへのTLS証明書検証を無効化します。
-  - 例: `uvx mcp-transcoder --insecure --headers x-api-key YOUR_API_KEY https://example/mcp`
-- 推奨: 検証無効ではなく、CA証明書を指定して検証を有効のままにする
-  - 例: `uvx mcp-transcoder --ssl-cert-file /path/to/cacert.pem https://example/mcp`
-  - 補足: `--ssl-cert-file` は MCP 接続の httpx クライアントにのみ適用され、`uvx` の依存解決（PyPI への接続）には影響しません。
+## TLS verification (enterprise CA / self-signed)
+- Adding `--insecure` disables certificate verification to the remote server.
+  - Example: `uvx mcp-transcoder --insecure --headers x-api-key YOUR_API_KEY https://example/mcp`
+- Recommended: Keep verification enabled and provide a CA certificate instead.
+  - Example: `uvx mcp-transcoder --ssl-cert-file /path/to/cacert.pem https://example/mcp`
+  - Note: `--ssl-cert-file` is applied only to the httpx client used for the MCP connection. It does not affect `uvx` dependency resolution (e.g., connections to PyPI).
 
-# テスト
+# Tests
 ```
 uv run pytest -q
 ```
 
-# uvx でキャッシュ対策
-uvxコマンドに、 --isolated --no-cache を付けるとキャッシュが古いエラーを回避できますので、テスト時には付与してください
+# uvx cache precautions
+To avoid issues caused by stale caches, pass `--isolated --no-cache` to the `uvx` command when testing.
 
-# url
-## pypi
+# URLs
+## PyPI
 https://pypi.org/project/mcp-transcoder/
-## git
+## GitHub
 https://github.com/post-class/mcp-transcoder/
+
