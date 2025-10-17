@@ -46,7 +46,7 @@ SSEには対応しておりません。
 | オプション | 意味 | 既定値 | 設定例 |
 |---|---|---|---|
 | `url` | 接続先の StreamableHTTP MCP エンドポイント（必須） | なし（必須） | `https://your_mcp_streamable_http_endpoint/mcp` |
-| `-H KEY VALUE` / `--headers KEY VALUE` | 追加のHTTPヘッダーを付与（APIキーなど）。`mcp-session-id` は常に除去 | なし | `--headers x-api-key YOUR_API_KEY`、`--headers Authorization "Bearer YOUR_TOKEN"` |
+| `-H KEY VALUE` / `--headers KEY VALUE` | 追加のHTTPヘッダーを付与（APIキーなど）。 | なし | `--headers x-api-key YOUR_API_KEY`、`--headers Authorization "Bearer YOUR_TOKEN"` |
 | `--insecure` / `--no-insecure` | TLS証明書検証を無効化/有効化 | 検証有効（`--no-insecure`） | 無効化: `--insecure`／推奨: `SSL_CERT_FILE=/path/to/cacert.pem uvx mcp-transcoder ...` |
 | `--timeout SECONDS` | 各リクエストの全体タイムアウト秒（initialize/list_tools/call_tool等） | `120`（または `MCP_PROXY_TIMEOUT` 環境変数） | `--timeout 300`、`MCP_PROXY_TIMEOUT=300 uvx mcp-transcoder ...` |
 | `--ssl-cert-file PATH` | MCP 接続時のみ使用する CA バンドル | なし（システム/既定の信頼ストア） | `--ssl-cert-file /path/to/cacert.pem` |
